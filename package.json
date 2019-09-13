@@ -1,0 +1,24 @@
+{
+  "name": "natours",
+  "version": "1.0.0",
+  "description": "Node js and Mongo Bootcamp",
+  "main": "index.js",
+  "scripts": {
+    "start:dev": "npx nodemon server.js",
+    "start:prod": "NODE_ENV=production npx nodemon server.js"
+  },
+  "author": "Joseph Wimalasuriya",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^8.0.0",
+    "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.6.9",
+    "morgan": "^1.9.1",
+    "nodemailer": "^6.3.0",
+    "nodemon": "^1.19.1",
+    "slugify": "^1.3.4",
+    "validator": "^11.1.0"
+  }
+}
