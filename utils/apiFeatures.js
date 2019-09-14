@@ -27,6 +27,7 @@ class APIFeatures{
 
     sort(){
         if (this.queryString.sort){
+            //console.log(this.queryString.sort);
             //127.0.0.1:3000/api/v1/tours?sort=-price,ratingAverage
             const sortBy = this.queryString.sort.split(',').join(' ');//this is to get this - { sort: '-price ratingAverage' }
             console.log(`sortBy ${sortBy}`);
