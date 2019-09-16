@@ -293,6 +293,13 @@ exports.getTour = catchAsync(async (req, res, next) => {
     // }
 
         //We can also use Tour.findOne({_id: req.params.id});
+        //In the tourModel.js we specified the ref. attribute as 'User' for guides field the DB stores only the guide ID 
+        //populates('guides') will populate the other data email and name etc.
+        // const tour = await Tour.findById(req.params.id).populate({//not using this any more using query MW
+        //     path: 'guides',
+        //     select: '-__v -passwordChangedAt' //omit these 2 fields in the output
+        // });
+
         const tour = await Tour.findById(req.params.id);
 
         if(!tour){

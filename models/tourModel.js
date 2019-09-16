@@ -2,6 +2,9 @@ const mongoose = require('mongoose');
 const slugify = require('slugify');
 //const validator = require('validator');
 
+//Models
+// const User = require('./userModel');
+
 const tourSchema = new mongoose.Schema({
     name: {
         type: String,
@@ -86,7 +89,39 @@ const tourSchema = new mongoose.Schema({
     secretTour: {
         type: Boolean,
         default: false
-    }
+    },
+    startLocation: {
+        //GEOJSON - it has to be specified as below
+        type: {
+            type: String,
+            default: 'Point',//other options - line, polygon
+            enum: ['Point']//we dont wnat line and polygon only Point
+        },
+        coordinates: [Number],//expecting a array of Numbers
+        address: String,//optional
+        description: String//optional
+    },
+    locations: [
+        {
+            //GEOJSON - it has to be specified as below
+            type: {
+                type: String,
+                default: 'Point',//other options - line, polygon
+                enum: ['Point']//we dont wnat line and polygon only Point
+            },
+            coordinates: [Number],//expecting a array of Numbers
+            address: String,//optional
+            description: String,//optional            
+            day: Number//optional 
+        }
+    ],
+    //guides: Array
+    guides: [
+        { 
+            type: mongoose.Schema.ObjectId,//ObjectId("5d...........")
+            ref: 'User' //means this comes from the User Collection(Happens behind the scenes), Not even necessary to import the User Model
+        }
+    ]
 },
 {   //enable virtual properties defined below
     toJSON: { virtuals: true },
@@ -94,7 +129,7 @@ const tourSchema = new mongoose.Schema({
 });
 
 //VIRTUAL PROPERTIES ARE FIELDS THAT WE DONT WANT IN THE DB BUT WE WANT THEM FOR CERTAIN CALCULATIONS EX - IF WE HAVE MILES STORED IN THE DB THEN WE 
-//DONT NEED TO STORE KILO METERS AS WELL WE CAN USE A VIRTUAL PROPERTY FOR THIS CONVERSION.
+//DONT NEED TO STORE KILO METERS AS WELL AS MILES WE CAN USE A VIRTUAL PROPERTY FOR THIS CONVERSION.
 //.get() because we want this on a get request
 //arrow functions dont have a this keyword only regular functions that's why we are using it here
 tourSchema.virtual('durationWeeks').get(function(){
@@ -111,6 +146,17 @@ tourSchema.pre('save', function(next){
     next();//if there is only 1 middle ware next is not necessary if there are more than 1 it is necessary
 });
 
+
+
+//another pre save middle ware (To get other guide info from the ID's and save it in the DB)
+//but if the user would change his Name or email all the tours will have to be updated, but we wont do it in this course
+//SO WE WONT BE USING THIS MW
+// tourSchema.pre('save', async function(next){
+//     const guidesPromises = this.guides.map(async id => await User.findById(id));
+//     this.guides = await Promise.all(guidesPromises);
+//     next();//if there is only 1 middle ware next is not necessary if there are more than 1 it is necessary
+// });
+
 // //another pre save middle ware
 // tourSchema.pre('save', function(next){
 //     console.log('Will save document!...');
@@ -125,11 +171,22 @@ tourSchema.pre('save', function(next){
 
 //QUERY MIDDLE WARE
 //these run before each QUERY, if we have certain tours that should only be available internally or to VIP's and not to the public
-//we will create a secret tour filed and query the DB for that
+//we will create a secret tour field and query the DB for that
 //tourSchema.pre('find', function(next){//works only for find
 tourSchema.pre(/^find/, function(next){//works with all find mehtods ex findOne()
     this.find({ secretTour: { $ne: true } });
     this.start = Date.now();
+    next();//if there is only 1 middle ware next is not necessary if there are more than 1 it is necessary
+});
+//QUERY MW
+//to populate other userinfo in get tours and get a single tour because the DB stores only the ID
+tourSchema.pre(/^find/, function(next){//works with all find mehtods ex findOne()
+    //In the tourModel.js we specified the ref. attribute as 'User' for guides the DB stores only the guide ID 
+    //populates('guides') will populate the other data email and name etc.
+    this.populate({
+        path: 'guides',
+        select: '-__v -passwordChangedAt' //omit these 2 fields in the output
+    });
     next();//if there is only 1 middle ware next is not necessary if there are more than 1 it is necessary
 });
 
