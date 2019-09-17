@@ -4,6 +4,7 @@ const express = require('express');
 const userController = require('../controllers/userController');
 const authController = require('../controllers/authController');
 
+
 const router = express.Router();//these have to be up here not below the route methods
 
 router.post('/signup', authController.signup);
@@ -26,5 +27,6 @@ router
 .get(userController.getUser)
 .patch(userController.updateUser)
 .delete(userController.deleteUser);
+
 
 module.exports = router;

@@ -299,8 +299,8 @@ exports.getTour = catchAsync(async (req, res, next) => {
         //     path: 'guides',
         //     select: '-__v -passwordChangedAt' //omit these 2 fields in the output
         // });
-
-        const tour = await Tour.findById(req.params.id);
+        //reviews is a virtual property created in the tourModel 
+        const tour = await Tour.findById(req.params.id).populate('reviews');//display the reviews only when getting one tour
 
         if(!tour){
             //when next receives anything it will jump directly into the global error handling MW

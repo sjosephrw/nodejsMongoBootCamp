@@ -119,9 +119,18 @@ const tourSchema = new mongoose.Schema({
     guides: [
         { 
             type: mongoose.Schema.ObjectId,//ObjectId("5d...........")
-            ref: 'User' //means this comes from the User Collection(Happens behind the scenes), Not even necessary to import the User Model
+            ref: 'User' //Child referencing, this comes from the User Collection(Happens behind the scenes), Not even necessary to import the User Model
         }
-    ]
+    ]//,
+    //we could have created a ary here that will store all the review IDs but that could grow indefinitely
+    // reviews: [//to get the reviews for a tour we could write a query to do it manually, but we are creating
+    //     //a child ref. as a virtual property that will store the reviews data in a virtual array that
+    //     //wont be persisted in the DB, but will only show in the output. 
+    //     {
+    //         type: mongoose.Schema.ObjectId,//ObjectId("5d...........")
+    //         ref: 'Review' //Child referencing, this comes from the review Collection(Happens behind the scenes), Not even necessary to import the review Model
+    //     }    
+    // ]
 },
 {   //enable virtual properties defined below
     toJSON: { virtuals: true },
@@ -134,6 +143,16 @@ const tourSchema = new mongoose.Schema({
 //arrow functions dont have a this keyword only regular functions that's why we are using it here
 tourSchema.virtual('durationWeeks').get(function(){
     return this.duration / 7;
+});
+
+//VIRTUAL PROPERTIES , reviews is the name of the virtual property
+//to get the reviews for a tour we could write a query to do it manually, but we are creating
+//a child ref. as a virtual property that will store the reviews data in a virtual array that
+//wont be persisted in the DB, but will only show in the output. 
+tourSchema.virtual('reviews', {
+    ref: 'Review',//the child reference.
+    foreignField: 'tour',//the tour field in the reviews collection (The 2 fields to join)
+    localField: '_id'//the _id field in the Tour Collection (The 2 fields to join)
 });
 
 //DOCUMENT MIDDLE WARE OR MONGOOSE MIDDLE WARE
