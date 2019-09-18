@@ -8,6 +8,8 @@ const Review = require('../models/reviewModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 
+//controllers
+const factory = require('./handlerFactory');
 
 exports.getAllReviews = catchAsync(async (req, res, next) => {
 
@@ -30,20 +32,34 @@ exports.getAllReviews = catchAsync(async (req, res, next) => {
 
 });
 
-exports.createReview = catchAsync(async (req, res, next) => {
+exports.setTourUserIds = (req, res, next) => {
     //allow nested routes
     //Implementing nested routes like these
     //POST /tours/212345/reviews
     if (!req.body.tour) req.body.tour = req.params.tourId;//get the tourId from the url
     if (!req.body.user) req.body.user = req.user.id;//get the userId
+    next();
+}
 
-    const newReview = await Review.create(req.body);
+exports.createReview = factory.createOne(Review);
+// exports.createReview = catchAsync(async (req, res, next) => {
+//     // //allow nested routes
+//     // //Implementing nested routes like these
+//     // //POST /tours/212345/reviews
+//     // if (!req.body.tour) req.body.tour = req.params.tourId;//get the tourId from the url
+//     // if (!req.body.user) req.body.user = req.user.id;//get the userId
 
-    res.status(201).json({
-        status: 'success',
-        data: {
-            review: newReview
-        }
-    });
+//     const newReview = await Review.create(req.body);
 
-});
+//     res.status(201).json({
+//         status: 'success',
+//         data: {
+//             review: newReview
+//         }
+//     });
+
+// });
+
+exports.updateReview = factory.updateOne(Review);
+
+exports.deleteReview = factory.deleteOne(Review);

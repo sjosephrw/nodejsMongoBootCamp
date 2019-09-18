@@ -9,6 +9,9 @@ const APIFeatures = require('../utils/apiFeatures');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 
+//controllers
+const factory = require('./handlerFactory');
+
 //used in tourROutes.js as a middleware function
 exports.aliasTopTours = (req, res, next) => {//changing the req objs. nested query obj query property values
     req.query.limit = '5';
@@ -163,70 +166,71 @@ exports.getAllTours = catchAsync(async (req, res, next) => {
 
 });
 
+exports.createTour = factory.createOne(Tour);
 
-exports.createTour = catchAsync(async (req, res, next) => {
-    // console.log(req.body);
-    // const newId = tours[tours.length - 1].id + 1;
-    // const newTour = Object.assign({ id: newId }, req.body);
+// exports.createTour = catchAsync(async (req, res, next) => {
+//     // console.log(req.body);
+//     // const newId = tours[tours.length - 1].id + 1;
+//     // const newTour = Object.assign({ id: newId }, req.body);
 
-    // tours.push(newTour);
+//     // tours.push(newTour);
 
-    // fs.writeFile(`${__dirname}/dev-data/data/tours-simple.json`, JSON.stringify(tours), err => {
-    //     //************* IMPORTANT We cant send 2 responses at the same time
-    //     res.status(201).json({
-    //         status: 'success',
-    //         data: {
-    //             tour: newTour
-    //         }
-    //     }
-    //     );
-    // });
+//     // fs.writeFile(`${__dirname}/dev-data/data/tours-simple.json`, JSON.stringify(tours), err => {
+//     //     //************* IMPORTANT We cant send 2 responses at the same time
+//     //     res.status(201).json({
+//     //         status: 'success',
+//     //         data: {
+//     //             tour: newTour
+//     //         }
+//     //     }
+//     //     );
+//     // });
 
-    //can create the tours this way also, but we are converting this controller method to a async function
-    // const newTour = new Tour({});
-    // newTour.save();
+//     //can create the tours this way also, but we are converting this controller method to a async function
+//     // const newTour = new Tour({});
+//     // newTour.save();
 
-    //can create the tours this way also, but we are converting this controller method to a async function
-    // Tour.create({})
-    // .then()
-    // .catch(err => {
-    //     console.log(err);
-    // });
+//     //can create the tours this way also, but we are converting this controller method to a async function
+//     // Tour.create({})
+//     // .then()
+//     // .catch(err => {
+//     //     console.log(err);
+//     // });
 
-    //But we can not do Tour.save();
+//     //But we can not do Tour.save();
 
-    // try {
+//     // try {
 
-    //     const newTour = await Tour.create(req.body);
+//     //     const newTour = await Tour.create(req.body);
 
-    //     res.status(201).json({
-    //         status: 'success',
-    //         data: {
-    //             tour: newTour
-    //         }
-    //     });
+//     //     res.status(201).json({
+//     //         status: 'success',
+//     //         data: {
+//     //             tour: newTour
+//     //         }
+//     //     });
 
-    // }catch(err){
+//     // }catch(err){
 
-    //     //400 = bad request
-    //     res.status(400).json({
-    //         status: 'fail',
-    //         message : err
-    //         //message: 'Invalid data sent!'//if we have this instead of message: err we wont be able to see the actual error message
-    //     });
-    // }
+//     //     //400 = bad request
+//     //     res.status(400).json({
+//     //         status: 'fail',
+//     //         message : err
+//     //         //message: 'Invalid data sent!'//if we have this instead of message: err we wont be able to see the actual error message
+//     //     });
+//     // }
 
 
-    const newTour = await Tour.create(req.body);
+//     const newTour = await Tour.create(req.body);
 
-    res.status(201).json({
-        status: 'success',
-        data: {
-            tour: newTour
-        }
-    });
+//     res.status(201).json({
+//         status: 'success',
+//         data: {
+//             tour: newTour
+//         }
+//     });
 
-});
+// });
 
 exports.getTour = catchAsync(async (req, res, next) => {
 
@@ -316,25 +320,55 @@ exports.getTour = catchAsync(async (req, res, next) => {
         });
 
 });
+//DONOT update passwords with this
+exports.updateTour = factory.updateOne(Tour);
 
-exports.updateTour = catchAsync(async (req, res, next) => {
-//we created checkID middleware to validate ID 
-//     if (req.params.id >= tours.length){
-//        //we are returning to stop code execution continuing
-//        return res.status(404).json({
-//            status: 'fail',
-//            message: 'Invalid ID'
-//        });        
-//    }
+//DONOT update passwords with this
+// exports.updateTour = catchAsync(async (req, res, next) => {
+// //we created checkID middleware to validate ID 
+// //     if (req.params.id >= tours.length){
+// //        //we are returning to stop code execution continuing
+// //        return res.status(404).json({
+// //            status: 'fail',
+// //            message: 'Invalid ID'
+// //        });        
+// //    }
 
-   //find will return the condition if the requirement is met
+//    //find will return the condition if the requirement is met
 
-//    try {
+// //    try {
+    
+// //     const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
+// //         new: true, //This will return the updated document, rather than the original
+// //         runValidators: true
+// //     });
+
+// //     res.status(200).json(
+// //         {
+// //         status: 'success', 
+// //         data: {
+// //             tour: tour
+// //         }
+// //     });
+
+// //     } catch(err){
+// //         //should n't the below be a 400 = bad request
+// //         res.status(404).json({
+// //             status: 'fail',
+// //             message : err
+// //             //message: 'Invalid data sent!'
+// //         });
+// //     }
     
 //     const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
 //         new: true, //This will return the updated document, rather than the original
 //         runValidators: true
 //     });
+
+//     if(!tour){
+//         //when next receives anything it will jump directly into the global error handling MW
+//         return next(new AppError('No tour was found with that ID', 404));
+//     }
 
 //     res.status(200).json(
 //         {
@@ -343,50 +377,48 @@ exports.updateTour = catchAsync(async (req, res, next) => {
 //             tour: tour
 //         }
 //     });
+// });
 
-//     } catch(err){
-//         //should n't the below be a 400 = bad request
-//         res.status(404).json({
-//             status: 'fail',
-//             message : err
-//             //message: 'Invalid data sent!'
-//         });
+exports.deleteTour = factory.deleteOne(Tour);
+
+// exports.deleteTour = catchAsync(async (req, res, next) => {
+// //we created checkID middleware to validate ID 
+// //     if (req.params.id >= tours.length){
+// //        //we are returning to stop code execution continuing
+// //        return res.status(404).json({
+// //            status: 'fail',
+// //            message: 'Invalid ID'
+// //        });        
+// //    }
+
+//    //find will return the condition if the requirement is met
+
+// //    try {
+    
+// //     await Tour.findByIdAndDelete(req.params.id);
+
+// //     res.status(204).json(
+// //         {
+// //         status: 'success', 
+// //         //when we are deleting we don't send data back we send null and status 204
+// //         data: null
+// //     });
+
+// //     } catch(err){
+// //         //should n't the below be a 400 = bad request
+// //         res.status(404).json({
+// //             status: 'fail',
+// //             message : err
+// //             //message: 'Invalid data sent!'
+// //         });
+// //     }
+
+//     const tour = await Tour.findByIdAndDelete(req.params.id);
+
+//     if(!tour){
+//         //when next receives anything it will jump directly into the global error handling MW
+//         return next(new AppError('No tour was found with that ID', 404));
 //     }
-    
-    const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
-        new: true, //This will return the updated document, rather than the original
-        runValidators: true
-    });
-
-    if(!tour){
-        //when next receives anything it will jump directly into the global error handling MW
-        return next(new AppError('No tour was found with that ID', 404));
-    }
-
-    res.status(200).json(
-        {
-        status: 'success', 
-        data: {
-            tour: tour
-        }
-    });
-});
-
-exports.deleteTour = catchAsync(async (req, res, next) => {
-//we created checkID middleware to validate ID 
-//     if (req.params.id >= tours.length){
-//        //we are returning to stop code execution continuing
-//        return res.status(404).json({
-//            status: 'fail',
-//            message: 'Invalid ID'
-//        });        
-//    }
-
-   //find will return the condition if the requirement is met
-
-//    try {
-    
-//     await Tour.findByIdAndDelete(req.params.id);
 
 //     res.status(204).json(
 //         {
@@ -395,31 +427,8 @@ exports.deleteTour = catchAsync(async (req, res, next) => {
 //         data: null
 //     });
 
-//     } catch(err){
-//         //should n't the below be a 400 = bad request
-//         res.status(404).json({
-//             status: 'fail',
-//             message : err
-//             //message: 'Invalid data sent!'
-//         });
-//     }
 
-    const tour = await Tour.findByIdAndDelete(req.params.id);
-
-    if(!tour){
-        //when next receives anything it will jump directly into the global error handling MW
-        return next(new AppError('No tour was found with that ID', 404));
-    }
-
-    res.status(204).json(
-        {
-        status: 'success', 
-        //when we are deleting we don't send data back we send null and status 204
-        data: null
-    });
-
-
-});
+// });
 
 exports.getTourStats = catchAsync(async (req, res, next) => {
     // try {

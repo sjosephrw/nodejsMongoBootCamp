@@ -5,6 +5,9 @@ const User = require('../models/userModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 
+//controllers
+const factory = require('./handlerFactory');
+
 const filterObj = (obj, ...allowedFields) => {
     const newObj = {};
     Object.keys(obj).forEach(el => {
@@ -84,24 +87,28 @@ exports.createUser = (req, res) => {
     });
 };
 
-exports.updateUser = (req, res) => {
+exports.updateUser = factory.updateOne(User);
 
-    console.log(req.requestTime);
+// exports.updateUser = (req, res) => {
 
-    res.status(500).json(
-        {
-        status: 'error', 
-        message: 'Method not defined.'
-    });
-};
+//     console.log(req.requestTime);
 
-exports.deleteUser = (req, res) => {
+//     res.status(500).json(
+//         {
+//         status: 'error', 
+//         message: 'Method not defined.'
+//     });
+// };
 
-    console.log(req.requestTime);
+exports.deleteUser = factory.deleteOne(User);
 
-    res.status(500).json(
-        {
-        status: 'error', 
-        message: 'Method not defined.'
-    });
-};
+// exports.deleteUser = (req, res) => {
+
+//     console.log(req.requestTime);
+
+//     res.status(500).json(
+//         {
+//         status: 'error', 
+//         message: 'Method not defined.'
+//     });
+// };
