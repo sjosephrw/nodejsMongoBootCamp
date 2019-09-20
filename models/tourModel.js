@@ -137,6 +137,14 @@ const tourSchema = new mongoose.Schema({
     toObject: { virtuals: true }
 });
 
+//lecture 166 improving read performance with indexes, 
+//{{URL}}/api/v1/tours?price[lt]=1000 when these URLs were run mongo will have to query all documents
+//and return the result that takes time, but with the index below (1 for price asc, -1 desc, most of the time 1 or -1 is not important) it does not take too long
+//tourSchema.index({ price: 1 });
+//{{URL}}/api/v1/tours?price[lt]=1000&ratingsAverage[gte]=4.7
+tourSchema.index({ price: 1, ratingsAverage: -1 });//compound index(DONT add too many indexes use a few because it takes a lot of DISK SPACE, we think price and ratingsAverage will be queried a lot thats why we set indexes on those fields)
+tourSchema.index({ slug: 1});
+
 //VIRTUAL PROPERTIES ARE FIELDS THAT WE DONT WANT IN THE DB BUT WE WANT THEM FOR CERTAIN CALCULATIONS EX - IF WE HAVE MILES STORED IN THE DB THEN WE 
 //DONT NEED TO STORE KILO METERS AS WELL AS MILES WE CAN USE A VIRTUAL PROPERTY FOR THIS CONVERSION.
 //.get() because we want this on a get request

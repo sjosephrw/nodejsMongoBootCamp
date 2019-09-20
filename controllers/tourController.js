@@ -5,9 +5,9 @@
 const Tour = require('../models/tourModel');
 
 //utils
-const APIFeatures = require('../utils/apiFeatures');
+// const APIFeatures = require('../utils/apiFeatures');
 const catchAsync = require('../utils/catchAsync');
-const AppError = require('../utils/appError');
+// const AppError = require('../utils/appError');
 
 //controllers
 const factory = require('./handlerFactory');
@@ -47,124 +47,128 @@ exports.aliasTopTours = (req, res, next) => {//changing the req objs. nested que
 //     next();//if we dont call next the request will get stuck here and we will never get a response.
 // };
 
-exports.getAllTours = catchAsync(async (req, res, next) => {
+///tours?duration[gte]=10&sort=price
 
-    // try {    
-    //console.log(req.requestTime);
-    //console.log(req.query);
+exports.getAllTours = factory.getAll(Tour);
 
-    // const queryObj = {...req.query};
-    // const excludedFields = ['page', 'sort', 'limit', 'fields'];
-    // excludedFields.forEach(el => delete queryObj[el]);
+// exports.getAllTours = catchAsync(async (req, res, next) => {
+
+//     // try {    
+//     //console.log(req.requestTime);
+//     //console.log(req.query);
+
+//     // const queryObj = {...req.query};
+//     // const excludedFields = ['page', 'sort', 'limit', 'fields'];
+//     // excludedFields.forEach(el => delete queryObj[el]);
 
 
 
-        // const tours = await Tour.find({
-        //     duration: 5,
-        //     difficulty: 'easy'
-        // });
+//         // const tours = await Tour.find({
+//         //     duration: 5,
+//         //     difficulty: 'easy'
+//         // });
 
-        // const tours = await Tour.find().where('duration').equals(5).where('difficulty').equals('easy');
-        // const tours = await Tour.find(req.query);
-        // const tours = await Tour.find(queryObj);
-        //it has to be done as below, because we have to chain paginate and other methods later
+//         // const tours = await Tour.find().where('duration').equals(5).where('difficulty').equals('easy');
+//         // const tours = await Tour.find(req.query);
+//         // const tours = await Tour.find(queryObj);
+//         //it has to be done as below, because we have to chain paginate and other methods later
         
-        //filtering data - duration greater than or equal to 5 price less than 1500   
-        //127.0.0.1:3000/api/v1/tours?duration[gte]=5&difficulty=easy&price[lt]=1500
+//         //filtering data - duration greater than or equal to 5 price less than 1500   
+//         //127.0.0.1:3000/api/v1/tours?duration[gte]=5&difficulty=easy&price[lt]=1500
        
-       //queryStr produces = { duration: { gte: '5' },difficulty: 'easy',price: { lt: '1500' } }
+//        //queryStr produces = { duration: { gte: '5' },difficulty: 'easy',price: { lt: '1500' } }
 
-        // let queryStr = JSON.stringify(queryObj);
+//         // let queryStr = JSON.stringify(queryObj);
 
-        // //127.0.0.1:3000/api/v1/tours?duration[gte]=5&difficulty=easy&price[lt]=1500
-        // //in this is what it should look like Tour.find({ duration: { '$gte': '5' },difficulty: 'easy',price: { '$lt': '1500' } })
+//         // //127.0.0.1:3000/api/v1/tours?duration[gte]=5&difficulty=easy&price[lt]=1500
+//         // //in this is what it should look like Tour.find({ duration: { '$gte': '5' },difficulty: 'easy',price: { '$lt': '1500' } })
 
-        // //we are using a regex to put a '$' sign in front of any gt or gte or lt or lte strings 
-        // queryStr = queryStr.replace(/\b(gt|gte|lt|lte)\b/g, match => `$${match}`);
-        // console.log(JSON.parse(queryStr));
+//         // //we are using a regex to put a '$' sign in front of any gt or gte or lt or lte strings 
+//         // queryStr = queryStr.replace(/\b(gt|gte|lt|lte)\b/g, match => `$${match}`);
+//         // console.log(JSON.parse(queryStr));
         
-        // let query = Tour.find(JSON.parse(queryStr));
+//         // let query = Tour.find(JSON.parse(queryStr));
         
-        // if (req.query.sort){
-        //     //127.0.0.1:3000/api/v1/tours?sort=-price,ratingAverage
-        //     const sortBy = req.query.sort.split(',').join(' ');//this is to get this - { sort: '-price ratingAverage' }
-        //     console.log(`sortBy ${sortBy}`);
-        //     //query.sort(req.query.sort);
-        //     query.sort(sortBy);
-        // } else {
-        //     //if no sort query param the sort by createdAt descending
-        //     query.sort('-createdAt'); // '-' is for sorting by descending order            
-        // }
+//         // if (req.query.sort){
+//         //     //127.0.0.1:3000/api/v1/tours?sort=-price,ratingAverage
+//         //     const sortBy = req.query.sort.split(',').join(' ');//this is to get this - { sort: '-price ratingAverage' }
+//         //     console.log(`sortBy ${sortBy}`);
+//         //     //query.sort(req.query.sort);
+//         //     query.sort(sortBy);
+//         // } else {
+//         //     //if no sort query param the sort by createdAt descending
+//         //     query.sort('-createdAt'); // '-' is for sorting by descending order            
+//         // }
         
-        // if (req.query.fields){
-        //     //127.0.0.1:3000/api/v1/tours?fields=name,price,duration,difficulty//to display only these fields
-        //     const fields = req.query.fields.split(',').join(' ');//to get this { fields: 'name price duration difficulty' }
-        //     console.log(`fields ${fields}`);
+//         // if (req.query.fields){
+//         //     //127.0.0.1:3000/api/v1/tours?fields=name,price,duration,difficulty//to display only these fields
+//         //     const fields = req.query.fields.split(',').join(' ');//to get this { fields: 'name price duration difficulty' }
+//         //     console.log(`fields ${fields}`);
             
-        //     query.select(fields);
-        // } else {
-        //     //if no field query param the exclude the __v field '-' means exclude
-        //     query.select('-__v');            
-        // }
+//         //     query.select(fields);
+//         // } else {
+//         //     //if no field query param the exclude the __v field '-' means exclude
+//         //     query.select('-__v');            
+//         // }
 
-        //4. PAGINATION
-        // || 1 means a default value of 1
-        // const page = req.query.page * 1 || 1;//we are multiplying by 1 to turn the string value into a number
+//         //4. PAGINATION
+//         // || 1 means a default value of 1
+//         // const page = req.query.page * 1 || 1;//we are multiplying by 1 to turn the string value into a number
         
-        // // || 100 means a default value of 100
-        // const limit = req.query.limit * 1 || 100;//we are multiplying by 1 to turn the string value into a number
+//         // // || 100 means a default value of 100
+//         // const limit = req.query.limit * 1 || 100;//we are multiplying by 1 to turn the string value into a number
                 
-        // const skip = (page - 1) * limit;
+//         // const skip = (page - 1) * limit;
 
-        // //127.0.0.1:3000/api/v1/tours?page=2&limit=4 , IF WE HAVE LIMIT 10 then 1 to 10 (page 1), 11 to 20 (page 2), 21 to 30 (page 3)
-        // query = query.skip(skip).limit(limit);//skip - page number, limit - results per page
+//         // //127.0.0.1:3000/api/v1/tours?page=2&limit=4 , IF WE HAVE LIMIT 10 then 1 to 10 (page 1), 11 to 20 (page 2), 21 to 30 (page 3)
+//         // query = query.skip(skip).limit(limit);//skip - page number, limit - results per page
 
-        // if(req.query.page){
-        //     const numTours = await Tour.countDocuments();
-        //     if(skip >= numTours) throw new Error('That page does not exist!');
-        // }
+//         // if(req.query.page){
+//         //     const numTours = await Tour.countDocuments();
+//         //     if(skip >= numTours) throw new Error('That page does not exist!');
+//         // }
 
-    //     const features = new APIFeatures(Tour.find(), req.query).filter().sort().limitFields().paginate();
+//     //     const features = new APIFeatures(Tour.find(), req.query).filter().sort().limitFields().paginate();
         
-    //     // const tours = await query;
-    //     const tours = await features.query;
+//     //     // const tours = await query;
+//     //     const tours = await features.query;
 
 
-    //     res.status(200).json(
-    //         {
-    //         status: 'success', 
-    //         requestedAt: req.requestTime,
-    //         results: tours.length,
-    //         data: {
-    //             tours: tours
-    //         }
-    //     });
-    // }catch(err){
-    //     //should n't the below be a 400 = bad request
-    //     res.status(404).json({
-    //         status: 'fail',
-    //         message : err
-    //         //message: 'Invalid data sent!'
-    //     });
-    // }
+//     //     res.status(200).json(
+//     //         {
+//     //         status: 'success', 
+//     //         requestedAt: req.requestTime,
+//     //         results: tours.length,
+//     //         data: {
+//     //             tours: tours
+//     //         }
+//     //     });
+//     // }catch(err){
+//     //     //should n't the below be a 400 = bad request
+//     //     res.status(404).json({
+//     //         status: 'fail',
+//     //         message : err
+//     //         //message: 'Invalid data sent!'
+//     //     });
+//     // }
 
-    const features = new APIFeatures(Tour.find(), req.query).filter().sort().limitFields().paginate();
+//     const features = new APIFeatures(Tour.find(), req.query).filter().sort().limitFields().paginate();
         
-    // const tours = await query;
-    const tours = await features.query;
+//     // const tours = await query;
+//     const tours = await features.query;
 
 
-    res.status(200).json(
-        {
-        status: 'success', 
-        requestedAt: req.requestTime,
-        results: tours.length,
-        data: {
-            tours: tours
-        }
-    });
+//     res.status(200).json(
+//         {
+//         status: 'success', 
+//         requestedAt: req.requestTime,
+//         results: tours.length,
+//         data: {
+//             tours: tours
+//         }
+//     });
 
-});
+// });
 
 exports.createTour = factory.createOne(Tour);
 
@@ -232,94 +236,96 @@ exports.createTour = factory.createOne(Tour);
 
 // });
 
-exports.getTour = catchAsync(async (req, res, next) => {
+exports.getTour = factory.getOne(Tour, { path: 'reviews'/*,select: *//*Not Necessary*/ });
 
-    //console.log(req.params);
+// exports.getTour = catchAsync(async (req, res, next) => {
 
-    // const tour = tours.forEach(t => {
-    //     if (req.params.id === t.id){
-    //         return t;
-    //     }
-    // });
+//     //console.log(req.params);
 
-    // res.status(200).json(
-    //     {
-    //     status: 'success', 
-    //     results: tours.length,
-    //     data: {
-    //         tours: tours
-    //     }
-    // });
+//     // const tour = tours.forEach(t => {
+//     //     if (req.params.id === t.id){
+//     //         return t;
+//     //     }
+//     // });
 
-    // const id = req.params.id * 1;
+//     // res.status(200).json(
+//     //     {
+//     //     status: 'success', 
+//     //     results: tours.length,
+//     //     data: {
+//     //         tours: tours
+//     //     }
+//     // });
 
-    // const tour = tours.find(el => el.id === id);//req.params.id * 1 can also be used to convert string to a number
+//     // const id = req.params.id * 1;
 
-    // // if (id >= tours.length){
-    // if (!tour){        
-    //     //we are returning to stop code execution continuing
-    //     return res.status(404).json({
-    //         status: 'fail',
-    //         message: 'Invalid ID'
-    //     });        
-    // }
+//     // const tour = tours.find(el => el.id === id);//req.params.id * 1 can also be used to convert string to a number
 
-    //find will return the condition if the requirement is met
+//     // // if (id >= tours.length){
+//     // if (!tour){        
+//     //     //we are returning to stop code execution continuing
+//     //     return res.status(404).json({
+//     //         status: 'fail',
+//     //         message: 'Invalid ID'
+//     //     });        
+//     // }
 
-    //we created checkID middleware to validate ID 
-    // if (req.params.id >= tours.length){
-    //     //we are returning to stop code execution continuing
-    //     return res.status(404).json({
-    //         status: 'fail',
-    //         message: 'Invalid ID'
-    //     });        
-    // }    
+//     //find will return the condition if the requirement is met
 
-    // try {
-    //     //We can also use Tour.findOne({_id: req.params.id});
-    //     const tour = await Tour.findById(req.params.id);
+//     //we created checkID middleware to validate ID 
+//     // if (req.params.id >= tours.length){
+//     //     //we are returning to stop code execution continuing
+//     //     return res.status(404).json({
+//     //         status: 'fail',
+//     //         message: 'Invalid ID'
+//     //     });        
+//     // }    
 
-    //     res.status(200).json(
-    //         {
-    //         status: 'success', 
-    //         data: {
-    //             tour: tour
-    //         }
-    //     });
+//     // try {
+//     //     //We can also use Tour.findOne({_id: req.params.id});
+//     //     const tour = await Tour.findById(req.params.id);
 
-    // } catch(err){
-    //     //should n't the below be a 400 = bad request
-    //     res.status(404).json({
-    //         status: 'fail',
-    //         message : err
-    //         //message: 'Invalid data sent!'
-    //     });
-    // }
+//     //     res.status(200).json(
+//     //         {
+//     //         status: 'success', 
+//     //         data: {
+//     //             tour: tour
+//     //         }
+//     //     });
 
-        //We can also use Tour.findOne({_id: req.params.id});
-        //In the tourModel.js we specified the ref. attribute as 'User' for guides field the DB stores only the guide ID 
-        //populates('guides') will populate the other data email and name etc.
-        // const tour = await Tour.findById(req.params.id).populate({//not using this any more using query MW
-        //     path: 'guides',
-        //     select: '-__v -passwordChangedAt' //omit these 2 fields in the output
-        // });
-        //reviews is a virtual property created in the tourModel 
-        const tour = await Tour.findById(req.params.id).populate('reviews');//display the reviews only when getting one tour
+//     // } catch(err){
+//     //     //should n't the below be a 400 = bad request
+//     //     res.status(404).json({
+//     //         status: 'fail',
+//     //         message : err
+//     //         //message: 'Invalid data sent!'
+//     //     });
+//     // }
 
-        if(!tour){
-            //when next receives anything it will jump directly into the global error handling MW
-            return next(new AppError('No tour was found with that ID', 404));
-        }
+//         //We can also use Tour.findOne({_id: req.params.id});
+//         //In the tourModel.js we specified the ref. attribute as 'User' for guides field the DB stores only the guide ID 
+//         //populates('guides') will populate the other data email and name etc.
+//         // const tour = await Tour.findById(req.params.id).populate({//not using this any more using query MW
+//         //     path: 'guides',
+//         //     select: '-__v -passwordChangedAt' //omit these 2 fields in the output
+//         // });
+//         //reviews is a virtual property created in the tourModel 
+//         const tour = await Tour.findById(req.params.id).populate('reviews');//display the reviews only when getting one tour
 
-        res.status(200).json(
-            {
-            status: 'success', 
-            data: {
-                tour: tour
-            }
-        });
+//         if(!tour){
+//             //when next receives anything it will jump directly into the global error handling MW
+//             return next(new AppError('No tour was found with that ID', 404));
+//         }
 
-});
+//         res.status(200).json(
+//             {
+//             status: 'success', 
+//             data: {
+//                 tour: tour
+//             }
+//         });
+
+// });
 //DONOT update passwords with this
 exports.updateTour = factory.updateOne(Tour);
 

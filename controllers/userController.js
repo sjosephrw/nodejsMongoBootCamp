@@ -17,21 +17,26 @@ const filterObj = (obj, ...allowedFields) => {
     return newObj;
 }
 
-exports.getAllUsers =  catchAsync(async (req, res, next) => {
+// exports.getAllUsers =  catchAsync(async (req, res, next) => {
 
-    console.log(req.requestTime);
-    const users = await User.find();
+//     console.log(req.requestTime);
+//     const users = await User.find();
 
-    res.status(200).json(
-        {
-        status: 'success', 
-        requestedAt: req.requestTime,
-        results: users.length,
-        data: {
-            users: users
-        }
-    });
-});
+//     res.status(200).json(
+//         {
+//         status: 'success', 
+//         requestedAt: req.requestTime,
+//         results: users.length,
+//         data: {
+//             users: users
+//         }
+//     });
+// });
+
+exports.getMe = (req, res, next) => {
+    req.params.id = req.user.id;
+    next();
+}
 
 exports.updateMe = catchAsync ( async (req, res, next) => {
     if (req.body.password || req.body.passwordConfirm){
@@ -65,16 +70,20 @@ exports.deleteMe = catchAsync( async (req, res, next) => {
     
 });
 
-exports.getUser = (req, res) => {
+exports.getAllUsers =  factory.getAll(User);
 
-    console.log(req.requestTime);
+exports.getUser = factory.getOne(User); 
 
-    res.status(500).json(
-        {
-        status: 'error', 
-        message: 'Method not defined.'
-    });
-};
+//(req, res) => {
+
+//     console.log(req.requestTime);
+
+//     res.status(500).json(
+//         {
+//         status: 'error', 
+//         message: 'Method not defined.'
+//     });
+// };
 
 exports.createUser = (req, res) => {
 
@@ -83,7 +92,7 @@ exports.createUser = (req, res) => {
     res.status(500).json(
         {
         status: 'error', 
-        message: 'Method not defined.'
+        message: 'Method not defined. Please use /signup instead.'
     });
 };
 
