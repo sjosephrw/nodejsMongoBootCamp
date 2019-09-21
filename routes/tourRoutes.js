@@ -39,6 +39,13 @@ router.route('/tour-stats').get(tourController.getTourStats);
 router.route('/monthly-plan/:year').get(authController.protect, authController.restrictTo('admin', 'lead-guide', 'guide'), tourController.getMonthlyPlan);
 
 // router.param('id', tourController.checkID);
+//geo spatioal queries lec - 170
+//can do it like this also - /tours-within?distance=100&center=1112222&unit=km , but the method below is cleaner
+///tours-within/250/center/45,23/unit/miles
+router.route('/tours-within/:distance/center/:latlng/unit/:unit').get(tourController.getToursWithin);
+
+//lec - 171 using geo spatial aggregation to calculate the distance to a tour from a certain point
+router.route('/distances/:latlng/unit/:unit').get(tourController.getDistances);
 
 router
 .route('/')

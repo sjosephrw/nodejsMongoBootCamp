@@ -37,6 +37,11 @@ const reviewSchema = new mongoose.Schema(
     //VIRTUAL PROPERTIES ARE FIELDS THAT WE DONT WANT IN THE DB BUT WE WANT THEM FOR CERTAIN CALCULATIONS EX - IF WE HAVE MILES STORED IN THE DB THEN WE 
     //DONT NEED TO STORE KILO METERS AS WELL AS MILES WE CAN USE A VIRTUAL PROPERTY FOR THIS CONVERSION.
 );
+//lecture 169 the app is prevented to prevent each user from placing multiple reviews on a single tour
+//for this we have to create multiple unique keys on 2 fields the tour and the user
+//1 or -1 does not matter
+//************IMPORTANT SOME TIMES THIS MIGHT NOT WORK AT ONCE IT MIGHT TAKE SEVERAL HOURS OR EVEN DAYS */
+reviewSchema.index({ tour: 1, user: 1 }, { unique: true });
 
 //QUERY MW
 //to populate other userinfo and tour info in getAllReviews because the DB stores only the tour and user ID

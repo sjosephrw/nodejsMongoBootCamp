@@ -7,7 +7,7 @@ const Tour = require('../models/tourModel');
 //utils
 // const APIFeatures = require('../utils/apiFeatures');
 const catchAsync = require('../utils/catchAsync');
-// const AppError = require('../utils/appError');
+const AppError = require('../utils/appError');
 
 //controllers
 const factory = require('./handlerFactory');
@@ -627,4 +627,89 @@ exports.getMonthlyPlan = catchAsync(async (req, res, next) => {
         data: { plan }
     });
 
+});
+
+///tours-within/250/center/45,23/unit/miles, lec 170
+exports.getToursWithin = catchAsync( async (req, res, next) => {
+    //using destructuring to get all our data at once from the query parameters
+    const { distance, latlng, unit } = req.params;//latlng = latitude longitude, he should have used center
+    const [lat, lng] = latlng.split(',');
+
+    //3963.2 - radius of earth in miles
+    //6378.1 - radius of earth in km
+    //Converting the radius into radians
+    const radius = unit === 'mi' ? distance/3963.2 : distance/6378.1; 
+
+    if (!lat || !lng){
+        next(new AppError('Please provide latitude and longitude in lat,lng format.', 400));
+    }
+
+    // console.log(lat, lng, distance, unit);
+    //$geolocate operator = geoWithin (locates tour within a radius(distance) of a given latitude and longitude))
+    const tours = await Tour.find({startLocation: 
+        { $geoWithin: 
+            { $centerSphere: 
+                //this will display geoJSON data in geoJson longitude comes first
+                //adn the radius value has to be converted to radians that is done above
+                [[ lng, lat ], radius]
+            }
+        }
+    });
+
+    res.status(200).json(
+        {
+        status: 'success',
+        results: tours.length,
+        data: {
+            data: tours
+        }
+//jesus saves
+//jesus saves
+
+
+    });
+});
+
+//lec - 171 using geo spatial aggregation to calculate the distance to a tour from a certain point
+exports.getDistances = catchAsync( async (req, res, next) => {
+    //using destructuring to get all our data at once from the query parameters
+    const { latlng, unit } = req.params;//latlng = latitude longitude, he should have used center
+    const [lat, lng] = latlng.split(',');
+
+    //0.000621371 - 1 meter in miles
+    //0.001 - 1m in km
+    const multiplier = unit === 'mi' ? 0.000621371 : 0.001; 
+
+    if (!lat || !lng){
+        next(new AppError('Please provide latitude and longitude in lat,lng format.', 400));
+    }  
+    
+    const distances = await Tour.aggregate([
+        {
+            //geoNear has to be the 1st state in the pipeline
+            $geoNear: {//for this to work at least 1 field has to have a geoSpatial Index we already did that in the model tourSchema.index({ startLocation: '2dsphere'});       
+                near: {//near is the point from what to calculate the distances
+                    type: 'Point',
+                    coordinates: [lng * 1, lat * 1]//*1 to convert the string value to a number (float)
+                },
+                distanceField: 'distance',
+                distanceMultiplier: multiplier//to display the distance in KM because it's displayed in meters
+            }
+        },{
+            $project: {
+                distance: 1,//to display the distance
+                name: 1//display the tour name, and hide all other data except the distance and name
+            }
+        }
+
+    ]); 
+    
+
+    res.status(200).json(
+        {
+        status: 'success',
+        data: {
+            data: distances
+        }
+    });    
 });

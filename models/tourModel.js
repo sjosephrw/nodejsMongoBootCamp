@@ -46,7 +46,8 @@ const tourSchema = new mongoose.Schema({
         type: Number,
         default: 4.5,
         max: [5, 'A rating can not be more than 5.0'],//can be used for dates as well
-        min: [1, 'A rating can not be less than 1.0']//can be used for dates as well        
+        min: [1, 'A rating can not be less than 1.0'],//can be used for dates as well        
+        set: (val) => Math.round(val * 10)/10 //setter function to round up the ratingsAverage to the nearest 1st decimal place, Lec - 169 
     },
     ratingsQuantity: {
         type: Number,
@@ -145,6 +146,11 @@ const tourSchema = new mongoose.Schema({
 tourSchema.index({ price: 1, ratingsAverage: -1 });//compound index(DONT add too many indexes use a few because it takes a lot of DISK SPACE, we think price and ratingsAverage will be queried a lot thats why we set indexes on those fields)
 tourSchema.index({ slug: 1});
 
+//lec - 170, to do geospatial queries we must specify a index on the field that stores the geospatial data
+//but this time we are not going to set it to 1 or -1, for geospatial data we need a special index
+//it is 2D sphere index if the data describes real points on a earth like sphere
+tourSchema.index({ startLocation: '2dsphere' });
+
 //VIRTUAL PROPERTIES ARE FIELDS THAT WE DONT WANT IN THE DB BUT WE WANT THEM FOR CERTAIN CALCULATIONS EX - IF WE HAVE MILES STORED IN THE DB THEN WE 
 //DONT NEED TO STORE KILO METERS AS WELL AS MILES WE CAN USE A VIRTUAL PROPERTY FOR THIS CONVERSION.
 //.get() because we want this on a get request
@@ -226,9 +232,16 @@ tourSchema.post(/^find/, function(docs, next){//works with all find mehtods ex f
 
 //though we are hiding the secret tours in the regular queries the tours are still being displayed in the AGGREGATION queries
 //to prevent this we use a aggregation middle ware.
+//**********IMPORTANT this MW was causing a error in lec - 171, Geospatial Aggregation:Calculating Distances */
+//SO WE WERE ASKED TO GET RID OF IT
 tourSchema.pre('aggregate', function(next){
-    // console.log(this.pipeline());
-    this.pipeline().unshift( { $match: { secretTour: { $ne: true } } } );
+    //console.log(this.pipeline());//THIS WAS SHOWING THE ERROR DESCRIBED ABOVE
+    // Hide secret tours if geoNear in lec 171 is NOT used
+    if (!(this.pipeline().length > 0 && '$geoNear' in this.pipeline()[0])) {
+            this.pipeline().unshift({
+                $match: { secretTour: { $ne: true } }
+            });
+    }    
     next();//if there is only 1 middle ware next is not necessary if there are more than 1 it is necessary
 });
 
