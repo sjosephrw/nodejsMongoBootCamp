@@ -1,5 +1,6 @@
 //core modules
 // const fs = require('fs');
+const path = require('path');
 
 //3rd party modules
 const morgan = require('morgan');
@@ -16,12 +17,23 @@ const globalErrorHandler = require('./controllers/errorController');
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
 const reviewRouter = require('./routes/reviewRoutes');
+const viewRouter = require('./routes/viewRoutes');
+
 
 const app = express();
+
+app.set('view engine', 'pug');//setting the type of view templating engine ex. ejs, handlebars, pug
+app.set('views', path.join(__dirname, 'views'));//can also do it like this app.set('views', './views'); but with __dirname it is safer
+//and no need to specify slashes in the path '/'
 
 
 //MIDDLE WARE FUNCTIONS
 /////////////////////////////////THE REQUEST RESPONSE CYCLE (This happens for every request)
+
+//MW to serve static files
+// app.use(express.static(`${__dirname}/public`));
+app.use(express.static(path.join(__dirname, 'public')));
+
 
 //to create several http security headers
 app.use(helmet());
@@ -74,9 +86,6 @@ app.use(hpp({
         'duration', 'ratingsQuantity', 'ratingsAverage', 'maxGroupSize', 'difficulty', 'price'
     ]
 }));
-
-//serving static files
-app.use(express.static(`${__dirname}/public`));
 
 //test middleware
 app.use((req, res, next) => {
@@ -296,6 +305,11 @@ app.use((req, res, next) => {
 
 // app.delete('/api/v1/tours/:id', deleteTour);
 
+
+//FRONT END
+app.use('/', viewRouter);
+
+//API
 app.use('/api/v1/tours', tourRouter);
 
 app.use('/api/v1/users', userRouter);
