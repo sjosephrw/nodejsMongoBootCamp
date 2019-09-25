@@ -10,6 +10,7 @@ const helmet = require('helmet');
 const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
+const cookieParser = require('cookie-parser');//to parse all incoming cookies ex - JWT
 
 //My Custom Modules
 const AppError = require('./utils/appError');
@@ -74,6 +75,8 @@ app.use('/api', limiter);
 
 //body parser, reading data from body, into req.body { limit: '10kb' } - limit body data to 10 kb
 app.use(express.json({ limit: '10kb' }));
+//coockie parser, reads all cookie data
+app.use(cookieParser());
 
 //data sanitization against NoSql query injection
 app.use(mongoSanitize());
@@ -99,6 +102,7 @@ app.use((req, res, next) => {
     req.requestTime = new Date().toISOString();
     // console.log('APP.js------------')
     // console.log(req.headers);
+    console.log(req.cookies);//outputs the JSON web
     next();//if we dont call next the request will get stuck here and we will never get a response.
 });
 

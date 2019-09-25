@@ -110,6 +110,8 @@ exports.protect = catchAsync ( async (req, res, next) => {
     if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')){
         //const is block scpoped meaning it can not be used outside of thei if statement so using let.
         token = req.headers.authorization.split(' ')[1];
+    } else if (req.cookies.jwt){//making it possible to read JWT from cookies
+        token = req.cookies.jwt;
     }
 
     // console.log(token);
@@ -137,6 +139,44 @@ exports.protect = catchAsync ( async (req, res, next) => {
 
     req.user = currentUser;
     next();//sends us back to the next route handler.
+});
+
+//THIS IS USED IN SERVER SIDE RENDERED PAGES AND WILL NOT GENERATE ANY ERRORS, IT IS QUITE SIMILAR TO THE PROTECT ROUTE
+//BUT BECAUSE IT WILL NOT GENERATE ANY ERRORS THE new AppError('') was removed
+exports.isLoggedIn = catchAsync ( async (req, res, next) => {
+ 
+    //IN THIS CASE THE TOKEN WILL BE PRESENT ONLY OIN THE COOKIES AND NOT THE HEADERS.
+    if (req.cookies.jwt){//making it possible to read JWT from cookies
+    //1. get token and check if it exists
+    let token;
+    token = req.cookies.jwt;
+    
+    // console.log(token);
+    //2. check if token is valid
+    //the function below takes a 3rd parameter a callback function but jonas uses the promisify method 
+    //from the util core module to make it a async function
+    const decoded = await promisify(jwt.verify)(req.cookies.jwt, process.env.JWT_SECRET);
+
+    //console.log(decoded);
+    //3. check if user still exists (if the user has been deleted after the token was issued)
+    const currentUser = await User.findById(decoded.id);
+
+    if (!currentUser){
+        return next();//401 - unauthorized        
+    }    
+
+    //4. check if the user chnaged the password after the token was issued
+    if(currentUser.changedPasswordAfter(decoded.iat)){
+        return next();//401 - unauthorized        
+    }
+
+    // req.user = currentUser;
+    //making the user object accessible by the pug templates res.locals makes it acessible
+    res.locals.user = currentUser;
+
+    return next();//sends us back to the next route handler.
+}
+    //next();//was generating a error, lec 189
 });
 
 //in order to pass parameters to a middleware function we have to create a wrapper function as below
