@@ -10,6 +10,12 @@ const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 const sendEmail = require('../utils/email');
 
+//https://stackoverflow.com/questions/33109103/object-prototype-function-to-test-if-it-is-defined-not-null
+Object.exists = function(obj) {
+    return typeof obj !== "undefined" && obj !== null;
+}
+
+
 
 const signToken = id => {
     return jwt.sign({ id: id }, process.env.JWT_SECRET, {
@@ -102,6 +108,20 @@ exports.login = catchAsync( async (req, res, next) => {
     // });
 });
 
+exports.logout = (req, res) => {
+    //to log the user out we create a new cookie but instead of the real JWT we put in some dummy text
+    //saying 'loggedout'
+    //and give that cookie a short expiration time of 10 seconds
+    res.cookie('jwt', 'loggedout', {
+        expires: new Date(Date.now() + 10 * 1000),
+        httpOnly: true,
+        secure: false//since it has no sensitive data, we set secure to false
+    });
+    res.status(200).json({
+        status: 'success'
+    });
+};
+
 //used in tourROutes.js as a middleware function
 exports.protect = catchAsync ( async (req, res, next) => {
     //1. get token and check if it exists
@@ -138,13 +158,18 @@ exports.protect = catchAsync ( async (req, res, next) => {
     }
 
     req.user = currentUser;
+    //making the user object accessible by the pug templates res.locals makes it acessible
+    res.locals.user = currentUser;
     next();//sends us back to the next route handler.
 });
 
 //THIS IS USED IN SERVER SIDE RENDERED PAGES AND WILL NOT GENERATE ANY ERRORS, IT IS QUITE SIMILAR TO THE PROTECT ROUTE
 //BUT BECAUSE IT WILL NOT GENERATE ANY ERRORS THE new AppError('') was removed
 exports.isLoggedIn = catchAsync ( async (req, res, next) => {
- 
+    //if the jwt stores the value of logged out then pass on to the next MW
+    //otherwise there will be a error when logging out lec 191, got this code from the Q and A 
+    if (req.cookies.jwt === 'loggedout') return next();
+
     //IN THIS CASE THE TOKEN WILL BE PRESENT ONLY OIN THE COOKIES AND NOT THE HEADERS.
     if (req.cookies.jwt){//making it possible to read JWT from cookies
     //1. get token and check if it exists
@@ -176,6 +201,12 @@ exports.isLoggedIn = catchAsync ( async (req, res, next) => {
 
     return next();//sends us back to the next route handler.
 }
+    //https://stackoverflow.com/questions/33109103/object-prototype-function-to-test-if-it-is-defined-not-null
+    if (!Object.exists(res.cookie.jwt)) {
+        // safely use myObject
+        return next();
+    }
+
     //next();//was generating a error, lec 189
 });
 
