@@ -8,7 +8,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/userModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
-const sendEmail = require('../utils/email');
+const Email = require('../utils/email');
 
 //https://stackoverflow.com/questions/33109103/object-prototype-function-to-test-if-it-is-defined-not-null
 Object.exists = function(obj) {
@@ -61,6 +61,11 @@ exports.signup =  catchAsync( async (req, res, next) => {
         passwordChangedAt: req.body.passwordChangedAt
     });
 
+    // const url = 'http://localhost:3000/me';
+    const url = `${req.protocol}://${req.hostname}:${req.port}/me`;//my account
+    console.log(url);
+
+    await new Email(newUser, url).sendWelcome();
     // const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, {
     //     expiresIn: process.env.JWT_EXPIRES_IN
     // });
@@ -240,11 +245,14 @@ exports.forgotPassword = catchAsync( async (req, res, next) => {
 
     const message = `Forgot your password submit a PATCH request to the url ${resetUrl} along with your password and confirm Password, if you did not request a reset just ignore this message.`
 
-    await sendEmail({
-        email: user.email,//req.body.email - also valid
-        subject: 'Reset email - valid for 10 minutes.',
-        message
-    });
+    // await sendEmail({
+    //     email: user.email,//req.body.email - also valid
+    //     subject: 'Reset email - valid for 10 minutes.',
+    //     message
+    // });
+
+
+    await new Email(user, resetUrl).sendPasswordReset();
 
     try{
         res.status(200).json({

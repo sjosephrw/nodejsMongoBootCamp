@@ -16,7 +16,10 @@ const userSchema = new mongoose.Schema({
         //custom validators
         validate: [validator.isEmail, 'Please provide a valid Email!']        
     },
-    photo: String,
+    photo: {
+        type: String,
+        default: 'default.jpg'
+    },
     role: {
         type: String,
         enum: ['user', 'guide', 'lead-guide', 'admin'],
@@ -50,29 +53,29 @@ const userSchema = new mongoose.Schema({
     }
 });
 
-// //mongoose middleware to hash password
-// userSchema.pre('save', async function(next){
-//     //'this' means the current document
-//     //if the password is not being modified then exit this function 
-//     if (!this.isModified('password')) return next();
+//mongoose middleware to hash password
+userSchema.pre('save', async function(next){
+    //'this' means the current document
+    //if the password is not being modified then exit this function 
+    if (!this.isModified('password')) return next();
 
-//     //hashing the password
-//     //bcrypt return a promise
-//     this.password = await bcrypt.hash(this.password, 12);
+    //hashing the password
+    //bcrypt return a promise
+    this.password = await bcrypt.hash(this.password, 12);
 
-//     //passwordConfirm though it is a required field, it is only required as a input and it is 
-//     //not to be persisted in the DB, that is why it is undefined below
-//     this.passwordConfirm = undefined;
-//     next();
-// });
+    //passwordConfirm though it is a required field, it is only required as a input and it is 
+    //not to be persisted in the DB, that is why it is undefined below
+    this.passwordConfirm = undefined;
+    next();
+});
 
-// //if the password has been modified then set the passwordChangedAT value to now. 
-// userSchema.pre('save', function(next){
-//     //if the password has NOT been modified or the document is new then exit this function 
-//     if (!this.isModified('password') || this.isNew) return next();
-//     this.passwordChangedAt = Date.now() - 1000;//subtract 1 sec. from now otherwise it causes a issue with the JWT making it impossible to login, this is a small hack to fix that
-//     next();
-// });
+//if the password has been modified then set the passwordChangedAT value to now. 
+userSchema.pre('save', function(next){
+    //if the password has NOT been modified or the document is new then exit this function 
+    if (!this.isModified('password') || this.isNew) return next();
+    this.passwordChangedAt = Date.now() - 1000;//subtract 1 sec. from now otherwise it causes a issue with the JWT making it impossible to login, this is a small hack to fix that
+    next();
+});
 
 //regex - find all methods beginning with find, findBydId, find, FindByIdAndUpdate
 //this is query middleware

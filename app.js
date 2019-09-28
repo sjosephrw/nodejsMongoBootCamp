@@ -12,6 +12,7 @@ const xss = require('xss-clean');
 const hpp = require('hpp');
 const cookieParser = require('cookie-parser');//to parse all incoming cookies ex - JWT
 
+
 //My Custom Modules
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
@@ -104,7 +105,7 @@ app.use((req, res, next) => {
     req.requestTime = new Date().toISOString();
     // console.log('APP.js------------')
     // console.log(req.headers);
-    console.log(req.cookies);//outputs the JSON web
+    //console.log(req.cookies);//outputs the JSON web
     next();//if we dont call next the request will get stuck here and we will never get a response.
 });
 

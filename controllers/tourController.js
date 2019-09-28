@@ -1,6 +1,10 @@
 //core modules
 //const fs = require('fs');
 
+//3rd part packages
+const multer = require('multer');//to parse multipart form data (IMAGE UPLOADS) - moved to userController
+const sharp = require('sharp');//to resize images uploaded by multer
+
 //models
 const Tour = require('../models/tourModel');
 
@@ -11,6 +15,82 @@ const AppError = require('../utils/appError');
 
 //controllers
 const factory = require('./handlerFactory');
+
+//refer to userController fro explanation of the code below
+const multerStorage = multer.memoryStorage();
+
+const multerFilter = (req, file, cb) => {
+
+    if (file.mimetype.startsWith('image')){ 
+        cb(null, true);
+    } else {
+        cb(new AppError('That is not a image, Please upload a valid image', 400), false);
+    }
+
+}
+
+const upload = multer( { storage: multerStorage, fileFilter: multerFilter } );
+
+//refer to userController fro explanation of the code above
+//upload.single('image')//to upload a single image
+//upload.array('images', 5)//if there are multiple images
+//below is for a mix of single and multiple
+exports.uploadTourImages = upload.fields([{ name: 'imageCover', maxCount: 1 }, { name: 'images', maxCount: 3 }]);//image cover - tour header image, images - other multiple images 
+
+exports.resizeTourImages = catchAsync ( async (req, res, next) => {
+    //refer to userController fro explanation of the code above
+    //upload.single('image')//to upload a single image, to access the file req.file
+    //upload.array('images', 5)//if there are multiple images, to access the file req.files
+    //below is for a mix of single and multiple, to access the files req.files
+    //console.log(`req.files`);
+    //console.log(req.files);//refer to the comments above to see why it's files and not file
+
+
+    if (!req.files.imageCover && !req.files.images) return next();
+
+    //const imageCoverFilename = `tour-${req.params.id}-${Date.now()}-cover.jpeg`;
+    //to update the request body with the imageCover that when it hits the updateTour Contoller function will save the tour cover image name in the DB
+    req.body.imageCover = `tour-${req.params.id}-${Date.now()}-cover.jpeg`;
+
+    // console.log(req.body.imageCover);
+
+    //resize the cover image
+    req.body.imageCover = `tour-${req.params.id}-${Date.now()}-cover.jpeg`;
+    await sharp(req.files.imageCover[0].buffer)
+      .resize(2000, 1333)
+      .toFormat('jpeg')
+      .jpeg({ quality: 90 })
+      .toFile(`public/img/tours/${req.body.imageCover}`);
+
+    // console.log(`----------------`);
+    // console.log(req.body);
+    // console.log(req.body.imageCover);
+    // console.log(`----------------`);
+    //req.body.imageCover = imageCoverFilename;//to update the request body with the imageCover that when it hits the updateTour Contoller function will save the tour cover image name in the DB
+    
+    //resizing the multiple tour images
+    req.body.images = [];
+
+    await Promise.all(
+        //map returns a array of promises so we use Promise.all
+        req.files.images.map( async (file, i) => {//loop through all the other images in req.files.images
+
+            const filename = `tour-${req.params.id}-${Date.now()}-${i + 1}.jpeg`;//i+1 becuase we want the tour name to appear as ...-1.jpeg, ...-2.jpeg, ...-3.jpeg
+            await sharp(file.buffer)
+            .resize(2000, 1333)
+            .toFormat('jpeg')
+            .jpeg({ quality: 90 })
+            .toFile(`public/img/tours/${filename}`);
+        
+            req.body.images.push(filename);//push the image names into req.body.images
+
+    }));
+
+    // console.log(req.body.images);
+
+    next();
+
+});
 
 //used in tourROutes.js as a middleware function
 exports.aliasTopTours = (req, res, next) => {//changing the req objs. nested query obj query property values

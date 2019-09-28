@@ -8,3 +8,5 @@ public/img/
 dev-data/
 #ignore the important folder
 important/
+#ignore the .cache folder
+.cache/
