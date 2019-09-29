@@ -4,7 +4,8 @@
   "description": "Node js and Mongo Bootcamp",
   "main": "index.js",
   "scripts": {
-    "start:dev": "npx nodemon server.js",
+    "dev": "npx nodemon server.js",
+    "start": "node server.js",
     "start:prod": "NODE_ENV=production npx nodemon server.js",
     "watch:js": "parcel watch ./public/js/index.js --out-dir ./public/js --out-file bundle.js",
     "build:js": "parcel build ./public/js/index.js --out-dir ./public/js --out-file bundle.js"
@@ -40,5 +41,8 @@
   },
   "devDependencies": {
     "parcel-bundler": "^1.12.3"
+  },
+  "engines": {
+    "node": ">=10.0.0"
   }
 }
