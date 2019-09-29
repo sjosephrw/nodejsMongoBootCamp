@@ -1,5 +1,9 @@
+//Models
 const Tour = require('../models/tourModel');
 const User = require('../models/userModel');
+const Booking = require('../models/bookingModel');
+
+//utils
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 
@@ -49,6 +53,21 @@ exports.getAccount = (req, res) => {
         title: `Your account.`
     });
 };
+
+exports.getMyTours = catchAsync ( async (req, res, next) => {
+    //Get all bookings
+    const bookings = await Booking.find({ user: req.user.id })
+    //Get tours with the returned IDS
+    const tourIDs = bookings.map(el => el.tour);
+
+    const tours = await Tour.find({ _id: { $in: tourIDs } });//tourIDs is a array find all the tours with the IDS in tourIDs    
+
+
+    res.status(200).render('overview', {
+        title: 'My Tours.',
+        tours: tours
+    });
+});
 
 exports.updateUserData = catchAsync(async (req, res, next) => {
     const updatedUser = await User.findByIdAndUpdate(//this does not update passwords because that does n't run the save MW that encrypts the password

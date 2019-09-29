@@ -4,8 +4,9 @@ import { login, logout } from './login';
 import { updateSettings } from './updateSettings';
 import { displayMap } from './mapbox';
 import { format } from 'util';
+import { bookTour } from './stripe';
 
-console.log('Hello from parcel!');
+// console.log('Hello from parcel!');
 
 //DOM ELEMENTS
 const mapBox = document.getElementById('map');
@@ -13,7 +14,7 @@ const loginForm = document.querySelector('.form--login');
 const userDataForm = document.querySelector('.form-user-data');
 const userPasswordForm = document.querySelector('.form-user-password');
 const logOutBtn = document.querySelector('.nav__el--logout');
-
+const bookBtn = document.getElementById('book-tour');
 
 //VALUES
 //the values below can not be placed here there was a error
@@ -74,5 +75,15 @@ if (userPasswordForm){
         document.getElementById('password-current').value = '';
         document.getElementById('password').value = '';
         document.getElementById('password-confirm').value = '';
+    });
+}
+
+if (bookBtn){
+    bookBtn.addEventListener('click', e => {
+
+        e.target.textContent = '...PROCESSING'
+    //    const tourId =  e.target.dataset.tourId;
+       const { tourId } =  e.target.dataset;
+       bookTour(tourId);
     });
 }

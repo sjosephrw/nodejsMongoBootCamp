@@ -2,6 +2,7 @@ const express = require('express');
 
 const viewsController = require('../controllers/viewsController')
 const authController = require('../controllers/authController')
+const bookingController = require('../controllers/bookingController');
 
 const router = express.Router();
 
@@ -10,7 +11,7 @@ const router = express.Router();
 // router.use(authController.isLoggedIn);
 
 //home page
-router.get('/', authController.isLoggedIn, viewsController.getOverview);
+router.get('/', bookingController.createBookingCheckout, authController.isLoggedIn, viewsController.getOverview);
 //individual tour details page
 router.get('/tour/:slug', authController.isLoggedIn, viewsController.getTour);
 //login page
@@ -19,6 +20,10 @@ router.get('/login', authController.isLoggedIn, viewsController.getLoginForm);
 //authController.isLoggedIn and authController.protect do certain things in a similar way
 //so we place protect here and isLoggedIn on top 
 router.get('/me', authController.protect, viewsController.getAccount);
+
+//my booked tours
+router.get('/my-tours', authController.protect, viewsController.getMyTours);
+
 
 router.post(
     '/submit-user-data',
