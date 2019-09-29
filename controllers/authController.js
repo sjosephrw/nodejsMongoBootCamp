@@ -63,7 +63,7 @@ exports.signup =  catchAsync( async (req, res, next) => {
 
     // const url = 'http://localhost:3000/me';
     const url = `${req.protocol}://${req.hostname}:${req.port}/me`;//my account
-    console.log(url);
+    // console.log(url);
 
     await new Email(newUser, url).sendWelcome();
     // const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, {

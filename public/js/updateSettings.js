@@ -20,7 +20,7 @@ export const updateSettings = async (data, type) => {
             showAlert('success', `${type.toUpperCase()} successfully changed.`);
         }
 
-        console.log(res);
+        // console.log(res);
     } catch (err){
         console.log(err);
         console.log(err.response.data);//this displays the JSON error we created in the API, if 

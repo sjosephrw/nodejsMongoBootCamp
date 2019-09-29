@@ -11,7 +11,7 @@ const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
 const cookieParser = require('cookie-parser');//to parse all incoming cookies ex - JWT
-
+const compression = require('compression');//to compress all text (JSON etc) thats sent to the client
 
 //My Custom Modules
 const AppError = require('./utils/appError');
@@ -99,6 +99,8 @@ app.use((req, res, next) => {
     console.log('Hello from the Middle Ware.');
     next();//if we dont call next the request will get stuck here and we will never get a response.
 });
+
+app.use(compression());//to compress all text (JSON etc) thats sent to the client
 
 //test middleware
 app.use((req, res, next) => {

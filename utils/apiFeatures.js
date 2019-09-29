@@ -18,7 +18,7 @@ class APIFeatures{
 
         //we are using a regex to put a '$' sign in front of any gt or gte or lt or lte strings 
         queryStr = queryStr.replace(/\b(gt|gte|lt|lte)\b/g, match => `$${match}`);
-        console.log(JSON.parse(queryStr));
+        // console.log(JSON.parse(queryStr));
 
         this.query = this.query.find(JSON.parse(queryStr));
         // let query = Tour.find(JSON.parse(queryStr));   
@@ -30,7 +30,7 @@ class APIFeatures{
             //console.log(this.queryString.sort);
             //127.0.0.1:3000/api/v1/tours?sort=-price,ratingAverage
             const sortBy = this.queryString.sort.split(',').join(' ');//this is to get this - { sort: '-price ratingAverage' }
-            console.log(`sortBy ${sortBy}`);
+            // console.log(`sortBy ${sortBy}`);
             //query.sort(req.query.sort);
             this.query = this.query.sort(sortBy);
         } else {
@@ -44,7 +44,7 @@ class APIFeatures{
         if (this.queryString.fields){
             //127.0.0.1:3000/api/v1/tours?fields=name,price,duration,difficulty//to display only these fields
             const fields = this.queryString.fields.split(',').join(' ');//to get this { fields: 'name price duration difficulty' }
-            console.log(`fields ${fields}`);
+            // console.log(`fields ${fields}`);
             
             this.query = this.query.select(fields);
         } else {

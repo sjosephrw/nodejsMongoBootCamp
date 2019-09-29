@@ -28,9 +28,9 @@ export const login = async (email, password) => {
             }, 3000);
         }
 
-        console.log(res);
+        // console.log(res);
     } catch (err){
-        console.log(err);
+        // console.log(err);
         console.log(err.response.data);//this displays the JSON error we created in the API, if 
         //a incorrect email or password is entered.
         showAlert('error', err.response.data.message);
@@ -48,7 +48,7 @@ export const logout = async () => {
             location.reload(true);//to force a reload on the server and clear browser cache
         }
 
-        console.log(res);        
+        // console.log(res);        
     } catch(err){
         console.log(err);
         console.log(err.response.data);//this displays the JSON error we created in the API, if 

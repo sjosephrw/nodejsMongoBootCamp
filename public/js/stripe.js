@@ -16,7 +16,7 @@ export const bookTour = async (tourId) => {
             sessionId: session.data.session.id//this is in the axios response
         });
 
-        console.log(session);
+        // console.log(session);
 
     } catch (err){
         console.log(err);

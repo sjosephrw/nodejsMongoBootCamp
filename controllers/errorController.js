@@ -15,7 +15,7 @@ const handelDuplicateFieldsDB = err => {
     //the forest hiker value will appear between '' so we are using a reg ex to acquire it
     //https://stackoverflow.com/questions/171480/regex-grabbing-values-between-quotation-marks
     const value = err.errmsg.match(/(["'])(\\?.)*?\1/)[0];
-    console.log(value);
+    // console.log(value);
     const message = `Duplicate field value ${value}, please use another value!`;
     return new AppError(message, 400);
 }
