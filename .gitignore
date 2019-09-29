@@ -3,7 +3,7 @@ node_modules/
 #ignore config.env file
 config.env
 #ignore the images folder because its too large
-public/img/
+#public/img/
 #ignore the dev-data folder
 dev-data/
 #ignore the important folder
