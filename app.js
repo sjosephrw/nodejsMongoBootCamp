@@ -25,6 +25,8 @@ const bookingRouter = require('./routes/bookingRoutes');
 
 const app = express();
 
+app.enable('trust proxy');//heroku uses proxies so to make it work with heroku
+
 app.set('view engine', 'pug');//setting the type of view templating engine ex. ejs, handlebars, pug
 app.set('views', path.join(__dirname, 'views'));//can also do it like this app.set('views', './views'); but with __dirname it is safer
 //and no need to specify slashes in the path '/'

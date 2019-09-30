@@ -3,7 +3,7 @@ const dotenv = require('dotenv');
 
 //to handle uncaught exception errors
 process.on('uncaughtException', err => {
-    console.log('UNHANDLED REJECTION! Shutting down...');
+    console.log('UNHANDLED REJECTION! 💥 Shutting down...');
     console.log(err.name, err.message);
     console.log(err);//I am logging this to see the entire error stack
     //server.close(()=> {//at this poin the server is undefined so we have no other alternative but to shutdown abruptly
@@ -83,7 +83,7 @@ const server = app.listen(port, ()=>{
 
 //to handle unhandled promise rejection errors
 process.on('unhandledRejection', err => {
-    console.log('UNHANDLED REJECTION! Shutting down...');
+    console.log('UNHANDLED REJECTION! 💥 Shutting down...');
     console.log(err.name, err.message);
     console.log(err);//I am logging this to see the entire error stack
     server.close(()=> {
@@ -92,3 +92,13 @@ process.on('unhandledRejection', err => {
     //process.exit(1);//( SHUTTING DOWN ABRUPTLY ) to shutdown the application, 1 - uncaught exception, 0 - success 
 });
 
+//to handle heroku sigterm signals
+//these signals shutdown the app from time to time, but the shutdown can be very abrupt to handle the
+//shtdown gracefully
+
+process.on('SIGTERM', () => {
+    console.log('👋 SIGTERM RECEIVED. Shutting down gracefully');
+    server.close(() => {
+      console.log('💥 Process terminated!');
+    });
+  });

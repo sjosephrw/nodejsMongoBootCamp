@@ -23,7 +23,7 @@ const signToken = id => {
     });
 };
 
-const createSendToken = (user, statusCode, res) => {
+const createSendToken = (user, statusCode, req, res) => {
 
     const token = signToken(user._id);
 
@@ -32,10 +32,15 @@ const createSendToken = (user, statusCode, res) => {
         new Date(
             Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
         ),
-        httpOnly: true
+        httpOnly: true,
+        secure: req.secure || req.headers['x-forwarded-proto'] === 'https'
     };
 
-    if (process.env.NODE_ENV === 'production') cookieOptions.secure = true;
+    //if (process.env.NODE_ENV === 'production') cookieOptions.secure = true;
+    //req.secure = https, req.headers['x-forwarded-proto']= to make it work with heroku
+    //if (req.secure || req.headers['x-forwarded-proto'] === 'https') cookieOptions.secure = true;//moved to the line above
+
+
 
     res.cookie('jwt', token, cookieOptions);
 
@@ -70,7 +75,7 @@ exports.signup =  catchAsync( async (req, res, next) => {
     //     expiresIn: process.env.JWT_EXPIRES_IN
     // });
 
-    createSendToken(newUser, 201, res);
+    createSendToken(newUser, 201, req, res);
 
     // const token = signToken(newUser._id);
 
@@ -103,7 +108,7 @@ exports.login = catchAsync( async (req, res, next) => {
     }
 
     //3. if every thing is OK, send the request to the client
-    createSendToken(user, 200, res);
+    createSendToken(user, 200, req, res);
 
     // const token = signToken(user._id);
 
@@ -288,7 +293,7 @@ exports.resetPassword = catchAsync ( async (req, res, next) => {
     user.passwordResetExpires = undefined;
     await user.save();
     //4. log the user in by sending a JWT
-    createSendToken(user, 200, res);
+    createSendToken(user, 200, req, res);
     // const token = signToken(user._id);
 
     // res.status(200).json({
@@ -313,5 +318,5 @@ exports.updatePassword = catchAsync ( async (req, res, next) => {
     //***********IMPORTANT CANT DO findByIdAndUpdate be cause the validation works only on create and save - refer to schema */
     
     //4. Login user send new JWT
-    createSendToken(user, 200, res);
+    createSendToken(user, 200, req, res);
 });
