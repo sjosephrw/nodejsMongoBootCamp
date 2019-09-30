@@ -12,6 +12,7 @@ const xss = require('xss-clean');
 const hpp = require('hpp');
 const cookieParser = require('cookie-parser');//to parse all incoming cookies ex - JWT
 const compression = require('compression');//to compress all text (JSON etc) thats sent to the client
+const cors = require('cors');//to implement Cross Origin Resource Sharing
 
 //My Custom Modules
 const AppError = require('./utils/appError');
@@ -31,9 +32,14 @@ app.set('view engine', 'pug');//setting the type of view templating engine ex. e
 app.set('views', path.join(__dirname, 'views'));//can also do it like this app.set('views', './views'); but with __dirname it is safer
 //and no need to specify slashes in the path '/'
 
-
 //MIDDLE WARE FUNCTIONS
 /////////////////////////////////THE REQUEST RESPONSE CYCLE (This happens for every request)
+
+//https://github.com/expressjs/cors
+//allow everyone to consume our API
+app.use(cors());////to implement Cross Origin Resource Sharing
+
+app.options('*', cors());//allow delete and patch requests to all routes
 
 //MW to serve static files
 // app.use(express.static(`${__dirname}/public`));
